@@ -48,12 +48,12 @@ class Ako
   # 確率は適当に......
   def generate_reply(tweet)
     reply = ''
-    case rand(10)
-    when 0..6
+    #case rand(10)
+    #when 0..6
       reply = generate_response_by_markov(tweet)
-    when 7..9
-      reply = generate_response_by_replies
-    end
+    #when 7..9
+    #  reply = generate_response_by_replies
+    #end
     return reply
   end
 
@@ -61,7 +61,7 @@ class Ako
   def generate_response_by_markov(tweet)
     user_id = tweet.user.id
     # いちいちload してるのは、api制限にかからないようにするためだと思われます
-    get_tweets(user_id)
+    get_tweets(user_id) if need_get_tweets(user_id)
     tweets = load_tweets(user_id)
     reply = @markov.generate(tweets)
   end
@@ -76,6 +76,27 @@ class Ako
     # 保存
     open("./data/user/#{user_id}", 'w') do |file|
       file.write(recent_tweets.join("\n"))
+    end
+  end
+
+  # user_id さんの200件保存日時を見て、
+  # 30分以内だったら新しく取得しません
+  # 毎回取得してたらapi制限にかかっちゃう
+  def need_get_tweets(user_id)
+    file_path = "./data/user/#{user_id}"
+
+    # ファイルがあるかどうか先に確認
+    if File.exists?(file_path)
+      time = Time.now
+      save_time = File.stat(file_path).mtime
+      if (time - save_time).abs < 60 * 30
+        return false
+      else
+        return true
+      end
+    else
+      # ファイルが無かった場合
+      return true
     end
   end
 

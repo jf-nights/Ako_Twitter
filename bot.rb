@@ -1,4 +1,4 @@
-require 'twitter'
+Bundler.require
 
 token = open('/home/jf712/.twitter/ako').read.split("\n")
 

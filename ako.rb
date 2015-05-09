@@ -9,6 +9,7 @@ class Ako
     @stream_client = @twilib.stream_client
     @twitter_client = @twilib.client
     @markov = Markov.new
+    @fav_list = open('./dic/fav_list').read.split("\n")
     # tweetとかの保存先が無かったら作成する
     FileUtils.mkdir_p('data/user') if !File.exists?('data/user')
  end
@@ -16,6 +17,8 @@ class Ako
   def recieve(tweet)
     # 保存
     save_timeline(tweet)
+    # ふぁぼるやつだったらふぁぼる
+    check_favorite(tweet)
     # 自分へのリプなら返信する
     if tweet.in_reply_to_screen_name == 'Ako_Hieda'
       response = generate_reply(tweet)
@@ -23,6 +26,7 @@ class Ako
     end
   end
 
+  # ------ timeline 保存 ------
   # 保存先は data/timeline.txt !!!!11(((
   def save_timeline(tweet)
     # 普通のTweetは全部保存
@@ -40,6 +44,20 @@ class Ako
     end
   end
 
+  # ------ favorite ------
+  # とりあえずあらかじめ特定のワードを登録しといて、
+  # それがあ含まれてたらふぁぼ(コンちゃんのぱくり
+  # 特定ワードは dic/fav_list に書く
+  ### こっちにopen('./dic...)を書いたら即座に反映出来るけど
+  ### tweetが流れてくるたびにopenするのなんか大丈夫なんかなぁって感じ
+  def check_favorite(tweet)
+    @fav_list.each do |word|
+      regexp = Regexp.new(word)
+      @twitter_client.favorite(tweet.id) if tweet.text =~ regexp
+    end
+  end
+
+  # ------ reply する ------
   # reply する
   # reply 方法は以下
   # 1. 相手の発言を基に文章生成(markov)

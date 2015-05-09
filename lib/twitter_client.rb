@@ -1,3 +1,4 @@
+require 'cgi'
 class TwitterClient
   attr_accessor :client, :stream_client
   def initialize(name)
@@ -16,5 +17,20 @@ class TwitterClient
       config.access_token        = token[2]
       config.access_token_secret = token[3]
     end
+  end
+
+  # @scree_name とか #hash_tag とかを取り除く
+  def clear_text(text)
+    text = text.dup
+    # screen_name
+    text.gsub!(/@\w+( )?/, '')
+    # hast_tag
+    text.gsub!(/#.*/, '')
+    # RT
+    text.gsub!(/RT( )?@(\w+):( )?/, '')
+    # unescape ('<' とか)
+    text = CGI.unescapeHTML(text)
+
+    return text
   end
 end

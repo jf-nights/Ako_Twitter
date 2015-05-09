@@ -7,6 +7,6 @@ warn "system start!!!"
 ako.stream_client.user do |object|
   case object
   when Twitter::Tweet
-    puts object.text
+    ako.recieve(object)
   end
 end

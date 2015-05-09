@@ -48,12 +48,12 @@ class Ako
   # 確率は適当に......
   def generate_reply(tweet)
     reply = ''
-    #case rand(10)
-    #when 0..6
+    case rand(10)
+    when 0..7
       reply = generate_response_by_markov(tweet)
-    #when 7..9
-    #  reply = generate_response_by_replies
-    #end
+    when 8..9
+      reply = generate_response_by_replies
+    end
     return reply
   end
 

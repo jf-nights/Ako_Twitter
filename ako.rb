@@ -22,7 +22,7 @@ class Ako
     # 自分へのリプなら返信する
     if tweet.in_reply_to_screen_name == 'Ako_Hieda'
       response = generate_reply(tweet)
-      #@twitter_client.update(response)
+      @twitter_client.update("@#{tweet.user.screen_name} #{response}", :in_reply_to_status_id => tweet.id)
     end
   end
 

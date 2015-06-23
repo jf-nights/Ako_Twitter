@@ -38,8 +38,11 @@ class Ako
     # ただし自分の発言は無視
     # 保存先は(ry
     if tweet.in_reply_to_screen_name.class != Twitter::NullObject && tweet.user.screen_name != 'Ako_Hieda'
-      open('./data/replies.txt', 'a') do |file|
-        file.write(@twilib.clear_text(tweet.text) + "\n")
+      # 鍵アカの人のは保存しない
+      if tweet.user.protected == false
+        open('./data/replies.txt', 'a') do |file|
+          file.write(@twilib.clear_text(tweet.text) + "\n")
+        end
       end
     end
   end

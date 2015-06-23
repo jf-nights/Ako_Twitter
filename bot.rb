@@ -1,3 +1,4 @@
+require 'pp'
 Bundler.require
 
 require_relative './ako'
@@ -14,7 +15,9 @@ ako.stream_client.user do |object|
   doc = nil
   case object
   when Twitter::Tweet
-    doc = { :status => object.to_h }
+    if object.user.protected == false
+      doc = { :status => object.to_h }
+    end
     ako.recieve(object)
   end
   collection.insert_one(doc) unless doc.nil?

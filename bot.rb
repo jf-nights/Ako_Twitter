@@ -20,5 +20,9 @@ ako.stream_client.user do |object|
     end
     ako.recieve(object)
   end
-  collection.insert_one(doc) unless doc.nil?
+  begin
+    collection.insert_one(doc) unless doc.nil?
+  rescue
+    retry
+  end
 end

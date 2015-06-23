@@ -17,5 +17,9 @@ ako.stream_client.user do |object|
     doc = { :status => object.to_h }
     ako.recieve(object)
   end
-  collection.insert_one(doc) unless doc.nil?
+  begin
+    collection.insert_one(doc) unless doc.nil?
+  rescue
+    retry
+  end
 end

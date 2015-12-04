@@ -15,7 +15,7 @@ coll = db[:ako]
 
 # 0分,30分は最近のTLから作る
 if Time.now.min == 0 || Time.now.min == 30
-  coll.find.sort(:_id => -1).limit(200).each do |row|
+  coll.find.sort(:_id => -1).limit(500).each do |row|
     tweets << row[:status][:text]
   end
 # 15分,45分は全部から

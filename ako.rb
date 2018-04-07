@@ -1,6 +1,7 @@
 require 'fileutils'
 require_relative './lib/twitter_client'
 require_relative './lib/markov2'
+require_relative './lib/slack_post'
 
 class Ako
   attr_accessor :stream_client
@@ -12,6 +13,7 @@ class Ako
     @fav_list = open('./dic/fav_list').read.split("\n")
     # tweetとかの保存先が無かったら作成する
     FileUtils.mkdir_p('data/user') if !File.exists?('data/user')
+    @slack_client = SlackClient.new
  end
 
   def recieve(tweet)
@@ -24,6 +26,8 @@ class Ako
       response = generate_reply(tweet)
       @twitter_client.update("@#{tweet.user.screen_name} #{response}", :in_reply_to_status_id => tweet.id)
     end
+    # slackに流す?
+    post_to_slack(tweet)
   end
 
   # ------ timeline 保存 ------
@@ -76,6 +80,18 @@ class Ako
       reply = generate_response_by_replies
     end
     return reply
+  end
+
+  # ------ slackに流す -----
+  # とりあえず僕の配信のついーととか(個別？
+  def post_to_slack(tweet)
+    if tweet.user.screen_name == "jf_nights"
+      text = tweet.text
+      if text =~ /【配信開始】/
+        @slack_client.post("#reiankyo", tweet.text)
+        #@slack_client.post("#broadcast", tweet.text)
+      end
+    end
   end
 
   # markov 連鎖でreply を作る
